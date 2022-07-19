@@ -6,7 +6,7 @@ module Earth2
       attr_reader :scope
 
       def initialize(scope = nil)
-        @scope = scope
+        @scope = scope.presence && normalize_scope(scope)
       end
 
       # @param topic [String, Symbol] The topic
@@ -26,6 +26,10 @@ module Earth2
       end
 
       protected
+
+      def normalize_scope(scope)
+        scope.is_a?(Array) ? scope.reject(&:blank?).join('.') : scope
+      end
 
       def prefix
         @prefix ||= scope.concat('.')
