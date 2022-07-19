@@ -29,13 +29,18 @@ module Earth2
         end
       end
 
-      def delete(topics)
+      def delete_many(topics)
         Array(topics).each do |name|
-          next unless name.in?(kafka_topics)
-
-          kafka.delete_topic(name)
-          puts "#{name} topic removed"
+          delete(name)
         end
+      end
+
+      def delete(name)
+        return unless name.in?(kafka_topics)
+
+        full_name = to_outgoing_topic(name)
+        kafka.delete_topic(full_name)
+        puts "#{full_name} topic removed"
       end
 
       def delete_all
@@ -54,27 +59,30 @@ module Earth2
       end
 
       def create_topic(name, options)
-        puts "Create #{name} topic with options:"
+        full_name = to_outgoing_topic(name)
+        puts "Create #{full_name} topic with options:"
         print_options(options)
-        kafka.create_topic(name, **options)
+        kafka.create_topic(full_name, **options)
       end
 
       def alter_config_for(name, config = {})
         return if config.blank?
 
-        existing_config = kafka.describe_topic(name, config.keys)
+        full_name = to_outgoing_topic(name)
+        existing_config = kafka.describe_topic(full_name, config.keys)
         return if existing_config == config
 
-        puts "Alter #{name} topic config with:"
+        puts "Alter #{full_name} topic config with:"
         print_options(config)
-        kafka.alter_topic(name, config)
+        kafka.alter_topic(full_name, config)
       end
 
       def alter_partitions_for(name, num_partitions)
         return if num_partitions.nil? || (num_partitions == kafka.partitions_for(name))
 
-        puts "Alter #{name} topic with #{num_partitions} partitions"
-        kafka.create_partitions_for(name, num_partitions: num_partitions)
+        full_name = to_outgoing_topic(name)
+        puts "Alter #{full_name} topic with #{num_partitions} partitions"
+        kafka.create_partitions_for(full_name, num_partitions: num_partitions)
       end
 
       def kafka
@@ -86,6 +94,14 @@ module Earth2
       end
 
       protected
+
+      def to_outgoing_topic(name)
+        if defined?(Karafka)
+          Karafka::App.config.topic_mapper.outgoing(name)
+        else
+          name
+        end
+      end
 
       def load_file(file_path)
         yaml_content = ERB.new(File.read(file_path)).result

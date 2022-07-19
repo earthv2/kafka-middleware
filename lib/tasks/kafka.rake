@@ -8,7 +8,7 @@ namespace :kafka do
 
   task :delete, %i[config_path] => :environment do |_, args|
     args.with_defaults(config_path: ENV.fetch('CONFIG_PATH', Rails.root.join('config/topics.yaml')))
-    Earth2::Kafka::TopicsManager.new(args.config_path).delete(args.extras)
+    Earth2::Kafka::TopicsManager.new(args.config_path).delete_many(args.extras)
   end
 
   task :delete, %i[config_path] => :environment do |_, args|
