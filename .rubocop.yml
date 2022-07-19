@@ -1,0 +1,30 @@
+AllCops:
+  Exclude:
+    - 'vendor/**/*'
+  NewCops: enable
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+Layout/LineLength:
+  Max: 125
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  IgnoredMethods:
+    - context
+    - describe
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/MethodLength:
+  Max: 30
+
+Naming/InclusiveLanguage:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
