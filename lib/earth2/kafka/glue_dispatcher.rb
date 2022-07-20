@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'avro'
+
 module Earth2
   module Kafka
     class GlueDispatcher
@@ -90,7 +92,7 @@ module Earth2
       end
 
       def validate_compression_byte(compression_byte)
-        raise 'Compression byte is wrong' unless compression_byte.in?(COMPRESSIONS_BYTES)
+        raise 'Compression byte is wrong' unless COMPRESSIONS_BYTES.include?(compression_byte)
       end
 
       def compress(message, should_compress: false)

@@ -46,7 +46,7 @@ module Earth2
 
       def exists?(name)
         full_name = to_outgoing_topic(name)
-        full_name.in?(kafka_topics)
+        kafka_topics.include?(full_name)
       end
 
       def create_or_alter_topic(name, options)

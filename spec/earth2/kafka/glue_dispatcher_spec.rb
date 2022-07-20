@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-# require 'earth2/glue_dispatcher'
+require 'earth2/kafka/glue_schema_registry'
+require 'json'
 
 RSpec.describe Earth2::Kafka::GlueDispatcher do
   describe '#uuid_to_binary' do
@@ -14,22 +15,21 @@ RSpec.describe Earth2::Kafka::GlueDispatcher do
     end
   end
 
-  describe '.encode', skip: true do
-    it 'works as expected' do
-      user = create(:user)
-      serializer = Msk::V1::UserSerializer.new(user)
-      schema = File.read('lib/schemas/v1/user.avsc')
+  describe '.encode' do
+    it 'must be encodable' do
+      schema = File.read('spec/fixtures/user.avsc')
+      json = JSON.parse(File.read('spec/fixtures/user.json'))
       schema_id = '217aad3b-003d-4df0-a9ee-4fc9708f40bd'
 
-      allow_any_instance_of(Earth2::GlueSchemaRegistry).
+      allow_any_instance_of(Earth2::Kafka::GlueSchemaRegistry).
         to receive(:get_schema).and_return({ 'schema' => schema, 'id' => schema_id })
 
       messaging = described_class.new(registry: 'earth2-development')
-      encoded_data = messaging.encode(serializer.to_hash, schema_name: 'user')
+      encoded_data = messaging.encode(json, schema_name: 'user')
 
       decoded_data = messaging.decode(encoded_data)
 
-      expect(decoded_data).to eq(serializer.to_hash)
+      expect(decoded_data).to eq(json.symbolize_keys)
     end
   end
 end

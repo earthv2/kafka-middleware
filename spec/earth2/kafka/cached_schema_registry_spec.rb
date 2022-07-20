@@ -7,7 +7,7 @@ RSpec.describe Earth2::Kafka::CachedSchemaRegistry do
   describe '.get_schema' do
     context 'when non cached' do
       it 'returns a schema object' do
-        schema = File.read('schemas/v1/user.avsc')
+        schema = File.read('spec/fixtures/user.avsc')
         schema_id = '217aad3b-003d-4df0-a9ee-4fc9708f40bd'
         schema_object = { 'schema' => schema, 'id' => schema_id }
 
@@ -24,7 +24,7 @@ RSpec.describe Earth2::Kafka::CachedSchemaRegistry do
 
     context 'when cached' do
       it 'calls a single remote call' do
-        schema = File.read('schemas/v1/user.avsc')
+        schema = File.read('spec/fixtures/user.avsc')
         schema_id = '217aad3b-003d-4df0-a9ee-4fc9708f40bd'
         schema_object = { 'schema' => schema, 'id' => schema_id }
         threads_count = 5

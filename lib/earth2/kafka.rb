@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'active_support/dependencies/autoload'
+require 'active_support/hash_with_indifferent_access'
+
 require_relative './kafka/railtie' if defined?(Rails)
 
 module Earth2
