@@ -19,12 +19,9 @@ module Earth2
         @config_path = config_path
       end
 
-      def sync
-        result = load_file(config_path)
-        topics = result.fetch('topics')
-        return if topics.nil?
-
-        topics.each do |name, options|
+      def sync(topics = nil)
+        topics_to_sync = ((topics.presence && config_topics.slice(*topics)) || config_topics)
+        topics_to_sync.each do |name, options|
           create_or_alter_topic(name, options.symbolize_keys)
         end
       end
@@ -36,7 +33,7 @@ module Earth2
       end
 
       def delete(name)
-        return unless name.in?(kafka_topics)
+        return unless exists?(name)
 
         full_name = to_outgoing_topic(name)
         kafka.delete_topic(full_name)
@@ -44,11 +41,16 @@ module Earth2
       end
 
       def delete_all
-        delete(kafka_topics)
+        delete_many(config_topics)
+      end
+
+      def exists?(name)
+        full_name = to_outgoing_topic(name)
+        full_name.in?(kafka_topics)
       end
 
       def create_or_alter_topic(name, options)
-        if kafka_topics.include?(name)
+        if exists?(name)
           return if options.blank?
 
           alter_partitions_for(name, options.fetch(:num_partitions))
@@ -78,9 +80,9 @@ module Earth2
       end
 
       def alter_partitions_for(name, num_partitions)
-        return if num_partitions.nil? || (num_partitions == kafka.partitions_for(name))
-
         full_name = to_outgoing_topic(name)
+        return if num_partitions.nil? || (num_partitions == kafka.partitions_for(full_name))
+
         puts "Alter #{full_name} topic with #{num_partitions} partitions"
         kafka.create_partitions_for(full_name, num_partitions: num_partitions)
       end
@@ -93,14 +95,19 @@ module Earth2
         @kafka_topics ||= kafka.topics.reject { |name| name.start_with?('__') }
       end
 
+      def config_topics
+        @config_topics ||= load_file(config_path)&.fetch('topics', [])
+      end
+
       protected
 
       def to_outgoing_topic(name)
-        if defined?(Karafka)
-          Karafka::App.config.topic_mapper.outgoing(name)
-        else
-          name
-        end
+        return name unless defined?(Karafka)
+
+        klass = Karafka::App.descendants.first
+        return name if klass.nil?
+
+        klass.config.topic_mapper.outgoing(name)
       end
 
       def load_file(file_path)

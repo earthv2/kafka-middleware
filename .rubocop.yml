@@ -16,6 +16,7 @@ Metrics/BlockLength:
   IgnoredMethods:
     - context
     - describe
+    - namespace
 
 Metrics/ClassLength:
   Max: 200
