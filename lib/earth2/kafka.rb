@@ -16,5 +16,6 @@ module Earth2
     autoload :GlueSchemaRegistry
     autoload :TopicsManager
     autoload :TopicMapper
+    autoload :ApplicationExtension
   end
 end
