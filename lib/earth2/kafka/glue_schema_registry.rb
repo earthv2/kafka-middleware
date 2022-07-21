@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'aws-sdk-glue'
+
 module Earth2
   module Kafka
     class GlueSchemaRegistry

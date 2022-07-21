@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'avro'
   spec.add_dependency 'aws-sdk-glue'
   spec.add_dependency 'erb'
+  spec.add_dependency 'nokogiri'
   spec.add_dependency 'ruby-kafka'
 
   # For more information and examples about making a new gem, checkout our
