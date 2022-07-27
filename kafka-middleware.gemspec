@@ -5,8 +5,8 @@ require_relative 'lib/earth2/kafka/version'
 Gem::Specification.new do |spec|
   spec.name          = 'kafka-middleware'
   spec.version       = Earth2::Kafka::VERSION
-  spec.authors       = ['Alex Pylko']
-  spec.email         = ['alexpylko@gmail.com']
+  spec.authors       = ['Earth2 (tm)']
+  spec.email         = ['info@earth2.io']
 
   spec.summary       = 'Kafka middleware'
   # spec.description   = "TODO: Write a longer description or delete this line."
